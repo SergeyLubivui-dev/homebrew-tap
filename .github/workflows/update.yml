@@ -1,0 +1,70 @@
+name: Update the formula
+
+# The tap updates itself rather than being pushed to from the other repository:
+# a workflow here needs nothing but its own GITHUB_TOKEN, while a push from
+# devtree would need a personal access token stored as a secret in two places.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Rewrite the formula if devtree has moved on
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          latest=$(gh release view --repo SergeyLubivui-dev/devtree --json tagName --jq .tagName)
+          version="${latest#v}"
+          current=$(grep -oP '(?<=^  version ")[^"]+' Formula/devtree.rb)
+
+          if [ "$version" = "$current" ]; then
+            echo "Already on $version."
+            exit 0
+          fi
+          echo "Updating $current → $version"
+
+          # One request for every checksum, from the release's own manifest.
+          checksums=$(mktemp)
+          gh release download "$latest" --repo SergeyLubivui-dev/devtree \
+            --pattern checksums.txt --output "$checksums" --clobber
+
+          sum() { grep " $1\$" "$checksums" | cut -d' ' -f1; }
+
+          python3 - "$version" "$latest" \
+            "$(sum "devtree_${latest}_darwin_arm64")" \
+            "$(sum "devtree_${latest}_darwin_amd64")" \
+            "$(sum "devtree_${latest}_linux_arm64")" \
+            "$(sum "devtree_${latest}_linux_amd64")" <<'PY'
+          import io, re, sys
+
+          version, tag, mac_arm, mac_intel, linux_arm, linux_intel = sys.argv[1:7]
+          path = "Formula/devtree.rb"
+          body = io.open(path, encoding="utf-8").read()
+
+          body = re.sub(r'^  version "[^"]+"', f'  version "{version}"', body, flags=re.M)
+          body = re.sub(r'/download/v[^/]+/devtree_v[^_]+_', f'/download/{tag}/devtree_{tag}_', body)
+
+          # The sha256 lines follow their url lines, in the order the file
+          # declares the platforms.
+          order = [mac_arm, mac_intel, linux_arm, linux_intel]
+          index = iter(order)
+          body = re.sub(r'sha256 "[0-9a-f]{64}"', lambda _: f'sha256 "{next(index)}"', body)
+
+          io.open(path, "w", encoding="utf-8", newline="\n").write(body)
+          print(f"formula now at {version}")
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "devtree $version"
+          git push
