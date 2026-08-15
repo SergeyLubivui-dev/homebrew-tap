@@ -1,7 +1,7 @@
 class Devtree < Formula
   desc "Tree-shaped development planning that lives inside your repository"
   homepage "https://github.com/SergeyLubivui-dev/devtree"
-  version "0.4.0"
+  version "0.5.0"
   license "MIT"
 
   # The released binaries, not a build from source: devtree has no dependencies
@@ -9,23 +9,23 @@ class Devtree < Formula
   # except a Go toolchain on every machine that installs it.
   on_macos do
     on_arm do
-      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.4.0/devtree_v0.4.0_darwin_arm64"
-      sha256 "9df73027d9a1342f5ac128654254e940f79564a624fa7178856d9af5111b225c"
+      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.5.0/devtree_v0.5.0_darwin_arm64"
+      sha256 "796ef0a8710ff0af3661f7c526fb1388bf79be59c037e60df1a1ab8e5b6894c8"
     end
     on_intel do
-      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.4.0/devtree_v0.4.0_darwin_amd64"
-      sha256 "39e09fd71bc587be91c8f7a5a42f4d3f43ae9026d569087995aab7a2d6f247f7"
+      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.5.0/devtree_v0.5.0_darwin_amd64"
+      sha256 "15081732f0982e82d18f23d51befadee54f7a7304f3ab6af63541e3442f5b44d"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.4.0/devtree_v0.4.0_linux_arm64"
-      sha256 "5975b3f85db8770500d1e5e12e018246e93e6ea2759136ca807b88b3b2ef8fea"
+      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.5.0/devtree_v0.5.0_linux_arm64"
+      sha256 "890a800b3754465fda57f49f5f8e66af2cb7e86e9b5ce3d15ce7b5dcc4551deb"
     end
     on_intel do
-      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.4.0/devtree_v0.4.0_linux_amd64"
-      sha256 "56e6313b26ecada18969dbcfe799e50aa67872dcd05a7ca1c61bb3981b489cd5"
+      url "https://github.com/SergeyLubivui-dev/devtree/releases/download/v0.5.0/devtree_v0.5.0_linux_amd64"
+      sha256 "462c15d0d66ccb1e76f589d5f70f45932d4cf4f89884fb682a6c58aba6b1aafd"
     end
   end
 
